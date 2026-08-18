@@ -359,39 +359,52 @@
       opacity: 0.62;
     }
 
+    /* Instagram-style message bar */
+
     .chatBar {
-      display: flex;
-      gap: 10px;
       padding: 12px 14px calc(12px + env(safe-area-inset-bottom));
       border-top: 1px solid var(--line);
       background: rgba(245, 243, 236, 0.92);
       backdrop-filter: blur(8px);
     }
 
-    .chatBar input {
-      flex: 1;
-      min-width: 0;
-      padding: 14px 16px;
+    .chatPill {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 6px 6px 18px;
       border: 1px solid var(--line);
-      border-radius: var(--radius-md);
+      border-radius: 999px;
       background: var(--white);
-      font-size: 16px;
       transition: border-color 120ms ease;
     }
 
-    .chatBar input:disabled {
-      opacity: 0.55;
-    }
-
-    .chatBar input:focus,
-    .chatBar input:focus-visible {
-      outline: none;
+    .chatPill:focus-within {
       border-color: rgba(17, 17, 17, 0.26);
     }
 
+    .chatPill input {
+      flex: 1;
+      min-width: 0;
+      border: 0;
+      background: transparent;
+      outline: none;
+      font-size: 16px;
+      padding: 9px 0;
+      color: var(--text);
+    }
+
+    .chatPill input::placeholder {
+      color: var(--muted);
+    }
+
+    .chatPill input:disabled {
+      opacity: 0.55;
+    }
+
     .sendBtn {
-      width: 50px;
-      height: 50px;
+      width: 42px;
+      height: 42px;
       flex: 0 0 auto;
       border: 0;
       border-radius: 50%;
@@ -403,8 +416,8 @@
     }
 
     .sendBtn svg {
-      width: 20px;
-      height: 20px;
+      width: 18px;
+      height: 18px;
     }
 
     .sendBtn:disabled {
@@ -443,24 +456,30 @@
       line-height: 1.5;
     }
 
+    .particleCanvas {
+      width: clamp(140px, 44vw, 190px);
+      height: clamp(140px, 44vw, 190px);
+      display: block;
+    }
+
     .incoming {
       height: 100%;
       display: flex;
       flex-direction: column;
       align-items: center;
-      justify-content: center;
-      gap: 18px;
-      padding: 20px;
+      padding: 6vh 20px calc(24px + env(safe-area-inset-bottom));
     }
 
     .incoming p {
-      margin: 0;
+      margin: 4px 0 0;
       font-size: 24px;
       font-weight: 800;
       letter-spacing: -0.03em;
+      text-align: center;
     }
 
-    .row {
+    .incoming .row {
+      margin-top: auto;
       width: min(100%, 360px);
       display: grid;
       grid-template-columns: 1fr 1fr;
@@ -508,21 +527,8 @@
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      gap: 12px;
+      gap: 10px;
       padding: 20px;
-    }
-
-    .avatar {
-      width: 116px;
-      height: 116px;
-      border-radius: 50%;
-      background: var(--text);
-      color: var(--bg);
-      display: grid;
-      place-items: center;
-      font-size: 24px;
-      font-weight: 800;
-      letter-spacing: -0.03em;
     }
 
     .timer {
@@ -719,27 +725,29 @@
         <div id="chatList" class="chatList" aria-live="polite"></div>
 
         <form id="chatForm" class="chatBar">
-          <input
-            id="chatInput"
-            type="text"
-            placeholder="Message…"
-            autocomplete="off"
-            aria-label="Message"
-            disabled
-          />
+          <div class="chatPill">
+            <input
+              id="chatInput"
+              type="text"
+              placeholder="Message…"
+              autocomplete="off"
+              aria-label="Message"
+              disabled
+            />
 
-          <button
-            id="chatSend"
-            class="sendBtn"
-            type="submit"
-            aria-label="Send message"
-            disabled
-          >
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-              <path d="M22 2 11 13"></path>
-              <path d="M22 2 15 22l-4-9-9-4z"></path>
-            </svg>
-          </button>
+            <button
+              id="chatSend"
+              class="sendBtn"
+              type="submit"
+              aria-label="Send message"
+              disabled
+            >
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M22 2 11 13"></path>
+                <path d="M22 2 15 22l-4-9-9-4z"></path>
+              </svg>
+            </button>
+          </div>
         </form>
       </section>
 
@@ -765,6 +773,7 @@
         </div>
 
         <div id="incomingCall" class="incoming hidden">
+          <canvas id="incomingParticles" class="particleCanvas" aria-hidden="true"></canvas>
           <p id="incomingText">Incoming voice call</p>
 
           <div class="row">
@@ -780,7 +789,7 @@
           </div>
 
           <div id="voiceSurface" class="voiceSurface">
-            <div class="avatar" aria-hidden="true">XUMi</div>
+            <canvas id="callParticles" class="particleCanvas" aria-hidden="true"></canvas>
             <p id="callStateText">Calling…</p>
             <p id="callTimer" class="timer">00:00</p>
           </div>
@@ -919,10 +928,144 @@
       let bannerTimer = null;
       let callErrorTimer = null;
 
+      const globes = {
+        active: null,
+        incoming: null
+      };
+
       init();
+
+      /* Particle globe */
+
+      function createParticleGlobe(canvas) {
+        const ctx = canvas.getContext("2d");
+        const COUNT = 170;
+        const TAU = Math.PI * 2;
+        const golden = Math.PI * (3 - Math.sqrt(5));
+        const particles = [];
+
+        for (let i = 0; i < COUNT; i++) {
+          const y = 1 - (i / (COUNT - 1)) * 2;
+          const radius = Math.sqrt(Math.max(0, 1 - y * y));
+          const theta = golden * i;
+
+          particles.push({
+            gx: Math.cos(theta) * radius,
+            gy: y,
+            gz: Math.sin(theta) * radius,
+            cx: (Math.random() * 2 - 1) * 0.85,
+            cy: (Math.random() * 2 - 1) * 0.85,
+            lx: 0.12 + Math.random() * 0.38,
+            ly: 0.12 + Math.random() * 0.38,
+            sx: 0.4 + Math.random() * 0.9,
+            sy: 0.4 + Math.random() * 0.9,
+            px: Math.random() * TAU,
+            py: Math.random() * TAU,
+            size: 0.6 + Math.random() * 0.9
+          });
+        }
+
+        let raf = null;
+        let running = false;
+        let startTime = 0;
+
+        function resize() {
+          const dpr = Math.min(window.devicePixelRatio || 1, 2);
+          const w = canvas.clientWidth;
+          const h = canvas.clientHeight;
+          if (!w || !h) return;
+          canvas.width = Math.round(w * dpr);
+          canvas.height = Math.round(h * dpr);
+          ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        }
+
+        function smooth(x) {
+          return x * x * (3 - 2 * x);
+        }
+
+        function frame(now) {
+          if (!running) return;
+          raf = requestAnimationFrame(frame);
+
+          const t = (now - startTime) / 1000;
+          const w = canvas.clientWidth;
+          const h = canvas.clientHeight;
+          if (!w || !h) return;
+
+          ctx.clearRect(0, 0, w, h);
+
+          const cx = w / 2;
+          const cy = h / 2;
+          const R = Math.min(w, h) * 0.34;
+
+          const cycle = t % 9;
+          let s;
+          if (cycle < 3.4) s = 0;
+          else if (cycle < 4.4) s = smooth((cycle - 3.4) / 1);
+          else if (cycle < 5.8) s = 1;
+          else if (cycle < 7.0) s = 1 - smooth((cycle - 5.8) / 1.2);
+          else s = 0;
+
+          const rot = t * 0.6;
+          const cosR = Math.cos(rot);
+          const sinR = Math.sin(rot);
+
+          for (const p of particles) {
+            const x1 = p.gx * cosR + p.gz * sinR;
+            const z1 = -p.gx * sinR + p.gz * cosR;
+            const y1 = p.gy;
+
+            const depth = (z1 + 1) / 2;
+            const gScale = R * (0.78 + depth * 0.42);
+            const gxPos = cx + x1 * gScale;
+            const gyPos = cy + y1 * gScale * 0.98;
+
+            const loopX = Math.cos(t * p.sx + p.px) * p.lx;
+            const loopY = Math.sin(t * p.sy + p.py) * p.ly;
+            const sxPos = cx + (p.cx + loopX) * w * 0.46;
+            const syPos = cy + (p.cy + loopY) * h * 0.46;
+
+            const x = gxPos + (sxPos - gxPos) * s;
+            const y = gyPos + (syPos - gyPos) * s;
+
+            const alpha = (0.25 + depth * 0.75) * (1 - s * 0.25);
+            const rad = p.size * (0.7 + depth * 0.6);
+
+            ctx.beginPath();
+            ctx.arc(x, y, rad, 0, TAU);
+            ctx.fillStyle = "rgba(17,17,17," + alpha.toFixed(3) + ")";
+            ctx.fill();
+          }
+        }
+
+        function onResize() {
+          resize();
+        }
+
+        return {
+          start() {
+            if (running) return;
+            running = true;
+            resize();
+            startTime = performance.now();
+            window.addEventListener("resize", onResize);
+            raf = requestAnimationFrame(frame);
+          },
+          stop() {
+            if (!running) return;
+            running = false;
+            cancelAnimationFrame(raf);
+            window.removeEventListener("resize", onResize);
+            ctx.clearRect(0, 0, canvas.clientWidth, canvas.clientHeight);
+          }
+        };
+      }
 
       function init() {
         bindUI();
+
+        globes.active = createParticleGlobe(document.getElementById("callParticles"));
+        globes.incoming = createParticleGlobe(document.getElementById("incomingParticles"));
 
         if (typeof Peer === "undefined") {
           setPairStatus("PeerJS failed to load. Check internet connection.");
@@ -968,7 +1111,7 @@
         els.acceptCall.addEventListener("click", acceptIncomingCall);
         els.declineCall.addEventListener("click", declineIncomingCall);
 
-        els.endCallBtn.addEventListener("click", () => endCall(true));
+        els.endCallBtn.addEventListener("click", () => endCall(true, "ended"));
         els.muteBtn.addEventListener("click", toggleMute);
         els.cameraBtn.addEventListener("click", toggleCamera);
 
@@ -1191,6 +1334,42 @@
 
         if (data.type === "bye") {
           handleConnectionClosed();
+          return;
+        }
+
+        if (data.type === "call-end") {
+          if (state.callStatus === "incoming") {
+            const call = state.incomingCall;
+            state.incomingCall = null;
+
+            try {
+              if (call) call.close();
+            } catch {
+              // Ignore.
+            }
+
+            resetCallState();
+            setCallError("Missed call.");
+          } else if (state.callStatus !== "idle") {
+            state.callClosing = true;
+
+            if (state.call) {
+              try {
+                state.call.close();
+              } catch {
+                // Ignore.
+              }
+            }
+
+            cleanupMedia();
+            resetCallState();
+
+            setTimeout(() => {
+              state.callClosing = false;
+            }, 500);
+
+            setCallError(data.reason === "declined" ? "Call declined." : "Call ended.");
+          }
           return;
         }
 
@@ -1748,6 +1927,14 @@
 
         state.incomingCall = null;
 
+        if (state.conn && state.conn.open) {
+          try {
+            state.conn.send({ type: "call-end", reason: "declined" });
+          } catch {
+            // Ignore.
+          }
+        }
+
         try {
           if (call) call.close();
         } catch {
@@ -1766,7 +1953,7 @@
             state.callStatus === "connecting" ||
             state.callStatus === "accepted"
           ) {
-            endCall(true);
+            endCall(true, "no-answer");
             setCallError("No answer. Try again.");
           }
         }, CALL_NO_ANSWER_MS);
@@ -1777,12 +1964,20 @@
         state.callTimeoutId = null;
       }
 
-      function endCall(notify = true) {
+      function endCall(notify = true, reason = "ended") {
         if (state.callStatus === "idle" && !state.call && !state.localStream) {
           return;
         }
 
         state.callClosing = true;
+
+        if (notify && state.conn && state.conn.open) {
+          try {
+            state.conn.send({ type: "call-end", reason });
+          } catch {
+            // Ignore.
+          }
+        }
 
         if (state.call) {
           try {
@@ -1863,16 +2058,8 @@
 
         const isVideo = state.callKind === "video";
 
-        els.videoSurface.classList.toggle(
-          "hidden",
-          !isVideo || !isActive
-        );
-
-        els.voiceSurface.classList.toggle(
-          "hidden",
-          isVideo && isActive
-        );
-
+        els.videoSurface.classList.toggle("hidden", !isVideo || !isActive);
+        els.voiceSurface.classList.toggle("hidden", isVideo && isActive);
         els.cameraBtn.classList.toggle("hidden", !isVideo);
 
         els.muteBtn.textContent = state.muted ? "Unmute" : "Mute";
@@ -1880,6 +2067,22 @@
 
         if (status !== "connected") {
           els.callTimer.textContent = "00:00";
+        }
+
+        if (globes.active) {
+          if (isActive && !isVideo) {
+            globes.active.start();
+          } else {
+            globes.active.stop();
+          }
+        }
+
+        if (globes.incoming) {
+          if (status === "incoming") {
+            globes.incoming.start();
+          } else {
+            globes.incoming.stop();
+          }
         }
       }
 
