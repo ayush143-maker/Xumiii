@@ -31,6 +31,7 @@
 
     * {
       box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
     }
 
     html,
@@ -51,6 +52,12 @@
     input {
       font: inherit;
       color: inherit;
+      touch-action: manipulation;
+    }
+
+    button {
+      user-select: none;
+      -webkit-user-select: none;
     }
 
     .hidden {
@@ -70,7 +77,7 @@
     }
 
     :focus-visible {
-      outline: 3px solid rgba(17, 17, 17, 0.28);
+      outline: 2px solid rgba(17, 17, 17, 0.16);
       outline-offset: 2px;
     }
 
@@ -204,6 +211,13 @@
       font-weight: 800;
       letter-spacing: 0.35em;
       text-transform: uppercase;
+      transition: border-color 120ms ease;
+    }
+
+    .codeInput:focus,
+    .codeInput:focus-visible {
+      outline: none;
+      border-color: rgba(17, 17, 17, 0.26);
     }
 
     .divider {
@@ -362,10 +376,17 @@
       border-radius: var(--radius-md);
       background: var(--white);
       font-size: 16px;
+      transition: border-color 120ms ease;
     }
 
     .chatBar input:disabled {
       opacity: 0.55;
+    }
+
+    .chatBar input:focus,
+    .chatBar input:focus-visible {
+      outline: none;
+      border-color: rgba(17, 17, 17, 0.26);
     }
 
     .sendBtn {
@@ -877,8 +898,11 @@
 
         callStartedAt: null,
         callTimerId: null,
+        callTimeoutId: null,
         callClosing: false
       };
+
+      const CALL_NO_ANSWER_MS = 30000;
 
       const peerConfig = {
         debug: 1,
@@ -1617,6 +1641,7 @@
           }
 
           setupCall(call);
+          startCallTimeout();
         } catch (err) {
           handleMediaError(err);
         }
@@ -1658,6 +1683,22 @@
         state.pendingIncoming = (call.metadata && call.metadata.kind) || "audio";
         state.callStatus = "incoming";
 
+        call.on("close", () => {
+          if (state.callStatus === "incoming" && state.incomingCall === call) {
+            state.incomingCall = null;
+            resetCallState();
+            setCallError("Missed call.");
+          }
+        });
+
+        call.on("error", () => {
+          if (state.callStatus === "incoming" && state.incomingCall === call) {
+            state.incomingCall = null;
+            resetCallState();
+            setCallError("Call failed.");
+          }
+        });
+
         switchTab("calls");
         renderCall();
       }
@@ -1685,6 +1726,7 @@
           call.answer(stream);
 
           renderCall();
+          startCallTimeout();
         } catch (err) {
           handleMediaError(err);
 
@@ -1713,6 +1755,26 @@
         }
 
         resetCallState();
+      }
+
+      function startCallTimeout() {
+        clearCallTimeout();
+
+        state.callTimeoutId = setTimeout(() => {
+          if (
+            state.callStatus === "requesting" ||
+            state.callStatus === "connecting" ||
+            state.callStatus === "accepted"
+          ) {
+            endCall(true);
+            setCallError("No answer. Try again.");
+          }
+        }, CALL_NO_ANSWER_MS);
+      }
+
+      function clearCallTimeout() {
+        clearTimeout(state.callTimeoutId);
+        state.callTimeoutId = null;
       }
 
       function endCall(notify = true) {
@@ -1759,6 +1821,8 @@
       }
 
       function resetCallState() {
+        clearCallTimeout();
+
         state.call = null;
         state.incomingCall = null;
         state.callKind = null;
@@ -1775,7 +1839,7 @@
       function renderCall() {
         const status = state.callStatus;
 
-        const activeStates = ["requesting", "accepted", "connecting", "connected"];
+        const activeStates = ["requesting", "connecting", "accepted", "connected"];
         const isActive = activeStates.includes(status);
 
         els.callIdle.classList.toggle("hidden", status !== "idle");
@@ -1821,6 +1885,8 @@
 
       function setCallConnected() {
         if (state.callStatus === "connected") return;
+
+        clearCallTimeout();
 
         state.callStatus = "connected";
         state.pendingIncoming = null;
