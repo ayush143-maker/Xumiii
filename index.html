@@ -471,7 +471,7 @@
     }
 
     .incoming p {
-      margin: 4px 0 0;
+      margin: 10px 0 0;
       font-size: 24px;
       font-weight: 800;
       letter-spacing: -0.03em;
@@ -529,6 +529,13 @@
       justify-content: center;
       gap: 10px;
       padding: 20px;
+    }
+
+    #callStateText.callTitle {
+      font-size: 24px;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      text-align: center;
     }
 
     .timer {
@@ -791,7 +798,7 @@
           <div id="voiceSurface" class="voiceSurface">
             <canvas id="callParticles" class="particleCanvas" aria-hidden="true"></canvas>
             <p id="callStateText">Calling…</p>
-            <p id="callTimer" class="timer">00:00</p>
+            <p id="callTimer" class="timer hidden">00:00</p>
           </div>
 
           <div class="callControls">
@@ -2056,6 +2063,11 @@
           els.callStateText.textContent = "";
         }
 
+        els.callStateText.classList.toggle(
+          "callTitle",
+          status === "requesting" || status === "connecting" || status === "accepted"
+        );
+
         const isVideo = state.callKind === "video";
 
         els.videoSurface.classList.toggle("hidden", !isVideo || !isActive);
@@ -2064,6 +2076,8 @@
 
         els.muteBtn.textContent = state.muted ? "Unmute" : "Mute";
         els.cameraBtn.textContent = state.cameraOff ? "Camera On" : "Camera Off";
+
+        els.callTimer.classList.toggle("hidden", status !== "connected");
 
         if (status !== "connected") {
           els.callTimer.textContent = "00:00";
