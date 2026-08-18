@@ -1,0 +1,1927 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>XUMi</title>
+  <meta name="description" content="Private conversations. Nothing permanent." />
+  <meta name="theme-color" content="#F5F3EC" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap"
+    rel="stylesheet"
+  />
+
+  <style>
+    :root {
+      --bg: #F5F3EC;
+      --text: #111111;
+      --muted: #6F6F6A;
+      --card: #FBFAF7;
+      --card-soft: #F1EFE7;
+      --line: rgba(17, 17, 17, 0.08);
+      --danger: #B3261E;
+      --white: #FFFFFF;
+      --radius-lg: 28px;
+      --radius-md: 18px;
+      --shadow: 0 1px 2px rgba(17, 17, 17, 0.03);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      margin: 0;
+      min-height: 100%;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: "Manrope", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      -webkit-font-smoothing: antialiased;
+      text-rendering: optimizeLegibility;
+    }
+
+    button,
+    input {
+      font: inherit;
+      color: inherit;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    .visuallyHidden {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      margin: -1px;
+      border: 0;
+      padding: 0;
+      clip: rect(0 0 0 0);
+      overflow: hidden;
+      white-space: nowrap;
+    }
+
+    :focus-visible {
+      outline: 3px solid rgba(17, 17, 17, 0.28);
+      outline-offset: 2px;
+    }
+
+    .screen {
+      min-height: 100vh;
+      min-height: 100dvh;
+    }
+
+    /* Pairing */
+
+    #pairingScreen {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 28px;
+      padding: 36px 20px;
+    }
+
+    .brandArea {
+      text-align: center;
+    }
+
+    .logo {
+      font-size: 56px;
+      font-weight: 800;
+      letter-spacing: -0.06em;
+      line-height: 1;
+    }
+
+    .logo.small {
+      font-size: 24px;
+      letter-spacing: -0.05em;
+    }
+
+    .tagline {
+      margin: 12px 0 0;
+      color: var(--muted);
+      font-size: 17px;
+      line-height: 1.45;
+    }
+
+    .pairingShell {
+      width: min(100%, 560px);
+      display: grid;
+      gap: 18px;
+    }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: var(--radius-lg);
+      padding: 28px;
+      box-shadow: var(--shadow);
+    }
+
+    .cardTitle {
+      margin: 0;
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--muted);
+    }
+
+    .pairCode {
+      margin: 22px 0;
+      font-size: clamp(56px, 14vw, 84px);
+      line-height: 1;
+      font-weight: 800;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+    }
+
+    .btn {
+      appearance: none;
+      width: 100%;
+      border: 1px solid transparent;
+      border-radius: var(--radius-md);
+      padding: 14px 18px;
+      font-size: 16px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: transform 120ms ease, opacity 120ms ease, background-color 120ms ease;
+    }
+
+    .btn:active {
+      transform: scale(0.99);
+    }
+
+    .btn:disabled {
+      opacity: 0.45;
+      cursor: not-allowed;
+    }
+
+    .btn.primary {
+      background: var(--text);
+      color: var(--bg);
+    }
+
+    .btn.secondary {
+      background: var(--white);
+      border-color: var(--line);
+      color: var(--text);
+    }
+
+    .btn.danger {
+      background: var(--danger);
+      color: rgba(255, 255, 255, 0.96);
+    }
+
+    .subtleStatus,
+    .errorText {
+      min-height: 1.3em;
+      margin: 14px 0 0;
+      font-size: 14px;
+      color: var(--muted);
+    }
+
+    .errorText {
+      color: var(--danger);
+    }
+
+    .codeInput {
+      width: 100%;
+      margin: 18px 0 14px;
+      padding: 16px 14px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius-md);
+      background: var(--white);
+      text-align: center;
+      font-size: 30px;
+      font-weight: 800;
+      letter-spacing: 0.35em;
+      text-transform: uppercase;
+    }
+
+    .divider {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .divider::before,
+    .divider::after {
+      content: "";
+      flex: 1;
+      height: 1px;
+      background: var(--line);
+    }
+
+    /* App shell */
+
+    #appScreen {
+      height: 100vh;
+      height: 100dvh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .appHeader {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 18px 20px 14px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .connectionArea {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #A8A59C;
+      flex: 0 0 auto;
+    }
+
+    .dot.connected {
+      background: #2E7D3A;
+    }
+
+    .dot.connecting {
+      background: #A8842D;
+    }
+
+    .dot.error {
+      background: var(--danger);
+    }
+
+    .appMain {
+      flex: 1;
+      min-height: 0;
+      position: relative;
+    }
+
+    .panel {
+      position: absolute;
+      inset: 0;
+      display: none;
+      min-height: 0;
+    }
+
+    .panel.active {
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Messages */
+
+    .chatList {
+      flex: 1;
+      min-height: 0;
+      overflow-y: auto;
+      padding: 20px 18px 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .emptyState {
+      padding: 28px 24px 0;
+      color: var(--muted);
+      text-align: center;
+      line-height: 1.5;
+    }
+
+    .msg {
+      display: flex;
+    }
+
+    .msg.me {
+      justify-content: flex-end;
+    }
+
+    .msg.them {
+      justify-content: flex-start;
+    }
+
+    .bubble {
+      max-width: min(76%, 560px);
+      padding: 12px 14px;
+      border-radius: 20px;
+      font-size: 16px;
+      line-height: 1.35;
+      overflow-wrap: break-word;
+    }
+
+    .me .bubble {
+      background: var(--text);
+      color: var(--bg);
+      border-bottom-right-radius: 7px;
+    }
+
+    .them .bubble {
+      background: var(--white);
+      border: 1px solid var(--line);
+      border-bottom-left-radius: 7px;
+    }
+
+    .time {
+      display: block;
+      margin-top: 7px;
+      font-size: 11px;
+      opacity: 0.62;
+    }
+
+    .chatBar {
+      display: flex;
+      gap: 10px;
+      padding: 12px 14px calc(12px + env(safe-area-inset-bottom));
+      border-top: 1px solid var(--line);
+      background: rgba(245, 243, 236, 0.92);
+      backdrop-filter: blur(8px);
+    }
+
+    .chatBar input {
+      flex: 1;
+      min-width: 0;
+      padding: 14px 16px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius-md);
+      background: var(--white);
+      font-size: 16px;
+    }
+
+    .chatBar input:disabled {
+      opacity: 0.55;
+    }
+
+    .sendBtn {
+      width: 50px;
+      height: 50px;
+      flex: 0 0 auto;
+      border: 0;
+      border-radius: 50%;
+      background: var(--text);
+      color: var(--bg);
+      display: grid;
+      place-items: center;
+      cursor: pointer;
+    }
+
+    .sendBtn svg {
+      width: 20px;
+      height: 20px;
+    }
+
+    .sendBtn:disabled {
+      opacity: 0.35;
+      cursor: not-allowed;
+    }
+
+    /* Calls */
+
+    .callIdle {
+      height: 100%;
+      overflow-y: auto;
+      padding: 20px;
+      display: grid;
+      gap: 16px;
+      align-content: start;
+    }
+
+    .callCard {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: var(--radius-lg);
+      padding: 24px;
+      box-shadow: var(--shadow);
+    }
+
+    .callCard h3 {
+      margin: 0 0 8px;
+      font-size: 24px;
+      letter-spacing: -0.03em;
+    }
+
+    .callCard p {
+      margin: 0 0 18px;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    .incoming {
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 18px;
+      padding: 20px;
+    }
+
+    .incoming p {
+      margin: 0;
+      font-size: 24px;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+    }
+
+    .row {
+      width: min(100%, 360px);
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    .activeCall {
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .videoSurface {
+      position: relative;
+      flex: 1;
+      min-height: 0;
+      margin: 16px 16px 0;
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      background: #000;
+    }
+
+    .videoSurface video {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .localVideo {
+      position: absolute;
+      right: 14px;
+      bottom: 14px;
+      width: 112px;
+      aspect-ratio: 3 / 4;
+      object-fit: cover;
+      border-radius: 18px;
+      border: 2px solid rgba(255, 255, 255, 0.32);
+      background: #000;
+    }
+
+    .voiceSurface {
+      flex: 1;
+      min-height: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      padding: 20px;
+    }
+
+    .avatar {
+      width: 116px;
+      height: 116px;
+      border-radius: 50%;
+      background: var(--text);
+      color: var(--bg);
+      display: grid;
+      place-items: center;
+      font-size: 24px;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+    }
+
+    .timer {
+      margin: 0;
+      color: var(--muted);
+      font-size: 18px;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .callControls {
+      display: flex;
+      justify-content: center;
+      gap: 14px;
+      padding: 18px 16px calc(18px + env(safe-area-inset-bottom));
+    }
+
+    .controlBtn {
+      min-width: 92px;
+      padding: 14px 18px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius-md);
+      background: var(--white);
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .controlBtn.danger {
+      background: var(--danger);
+      border-color: transparent;
+      color: rgba(255, 255, 255, 0.96);
+    }
+
+    /* Bottom nav */
+
+    .bottomNav {
+      display: flex;
+      gap: 8px;
+      padding: 10px 14px calc(10px + env(safe-area-inset-bottom));
+      border-top: 1px solid var(--line);
+      background: rgba(245, 243, 236, 0.92);
+      backdrop-filter: blur(8px);
+    }
+
+    .navBtn {
+      flex: 1;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 12px 10px;
+      border: 1px solid transparent;
+      border-radius: 20px;
+      background: transparent;
+      color: var(--muted);
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .navBtn svg {
+      width: 20px;
+      height: 20px;
+    }
+
+    .navBtn.active {
+      color: var(--text);
+      background: var(--card-soft);
+      border-color: var(--line);
+    }
+
+    .banner {
+      position: fixed;
+      top: 14px;
+      left: 50%;
+      transform: translateX(-50%) translateY(-8px);
+      max-width: min(calc(100vw - 28px), 480px);
+      padding: 12px 16px;
+      border-radius: 16px;
+      background: rgba(17, 17, 17, 0.94);
+      color: var(--bg);
+      font-size: 14px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 160ms ease, transform 160ms ease;
+      z-index: 60;
+    }
+
+    .banner.visible {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    @media (max-width: 640px) {
+      .logo {
+        font-size: 44px;
+      }
+
+      .card {
+        padding: 22px;
+      }
+
+      .pairCode {
+        margin: 18px 0;
+        letter-spacing: 0.14em;
+      }
+
+      .bubble {
+        max-width: 84%;
+      }
+
+      .localVideo {
+        width: 92px;
+        right: 10px;
+        bottom: 10px;
+      }
+
+      .callControls {
+        flex-wrap: wrap;
+      }
+
+      .controlBtn {
+        flex: 1;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      * {
+        transition: none !important;
+        animation: none !important;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div id="pairingScreen" class="screen">
+    <header class="brandArea">
+      <div class="logo">XUMi</div>
+      <p class="tagline">Private conversations. Nothing permanent.</p>
+    </header>
+
+    <main class="pairingShell">
+      <section class="card" aria-labelledby="yourCodeTitle">
+        <h2 id="yourCodeTitle" class="cardTitle">Your XUMi Code</h2>
+        <div id="myCode" class="pairCode" aria-live="polite">···</div>
+        <button id="copyBtn" class="btn secondary" type="button" disabled>Copy Code</button>
+        <p id="pairStatus" class="subtleStatus" role="status" aria-live="polite">
+          Generating code…
+        </p>
+      </section>
+
+      <div class="divider" aria-hidden="true"><span>or</span></div>
+
+      <section class="card" aria-labelledby="connectTitle">
+        <h2 id="connectTitle" class="cardTitle">Connect to someone</h2>
+
+        <label class="visuallyHidden" for="joinCodeInput">
+          Enter 3-character XUMi code
+        </label>
+
+        <input
+          id="joinCodeInput"
+          class="codeInput"
+          type="text"
+          maxlength="3"
+          placeholder="KQ7"
+          autocomplete="off"
+          autocapitalize="characters"
+          spellcheck="false"
+          inputmode="text"
+        />
+
+        <button id="joinBtn" class="btn primary" type="button">Connect</button>
+
+        <p id="joinError" class="errorText" role="alert"></p>
+      </section>
+    </main>
+  </div>
+
+  <div id="appScreen" class="screen hidden">
+    <header class="appHeader">
+      <div class="logo small">XUMi</div>
+
+      <div class="connectionArea">
+        <span id="connDot" class="dot connecting" aria-hidden="true"></span>
+        <span id="connText">Connecting…</span>
+      </div>
+    </header>
+
+    <main class="appMain">
+      <section id="messagesPanel" class="panel active" aria-label="Messages">
+        <div id="chatEmpty" class="emptyState">
+          Messages appear here. They disappear when the session ends.
+        </div>
+
+        <div id="chatList" class="chatList" aria-live="polite"></div>
+
+        <form id="chatForm" class="chatBar">
+          <input
+            id="chatInput"
+            type="text"
+            placeholder="Message…"
+            autocomplete="off"
+            aria-label="Message"
+            disabled
+          />
+
+          <button
+            id="chatSend"
+            class="sendBtn"
+            type="submit"
+            aria-label="Send message"
+            disabled
+          >
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M22 2 11 13"></path>
+              <path d="M22 2 15 22l-4-9-9-4z"></path>
+            </svg>
+          </button>
+        </form>
+      </section>
+
+      <section id="callsPanel" class="panel" aria-label="Calls">
+        <div id="callIdle" class="callIdle">
+          <article class="callCard">
+            <h3>Voice Call</h3>
+            <p>Audio only, direct browser-to-browser when possible.</p>
+            <button id="startVoice" class="btn primary" type="button">
+              Start Voice Call
+            </button>
+          </article>
+
+          <article class="callCard">
+            <h3>Video Call</h3>
+            <p>Camera and audio, with local preview.</p>
+            <button id="startVideo" class="btn primary" type="button">
+              Start Video Call
+            </button>
+          </article>
+
+          <p id="callError" class="errorText" role="alert"></p>
+        </div>
+
+        <div id="incomingCall" class="incoming hidden">
+          <p id="incomingText">Incoming voice call</p>
+
+          <div class="row">
+            <button id="acceptCall" class="btn primary" type="button">Accept</button>
+            <button id="declineCall" class="btn danger" type="button">Decline</button>
+          </div>
+        </div>
+
+        <div id="activeCall" class="activeCall hidden">
+          <div id="videoSurface" class="videoSurface hidden">
+            <video id="remoteVideo" autoplay playsinline aria-label="Remote video"></video>
+            <video id="localVideo" class="localVideo" autoplay playsinline muted aria-label="Local video preview"></video>
+          </div>
+
+          <div id="voiceSurface" class="voiceSurface">
+            <div class="avatar" aria-hidden="true">XUMi</div>
+            <p id="callStateText">Calling…</p>
+            <p id="callTimer" class="timer">00:00</p>
+          </div>
+
+          <div class="callControls">
+            <button id="muteBtn" class="controlBtn" type="button">Mute</button>
+            <button id="cameraBtn" class="controlBtn hidden" type="button">Camera Off</button>
+            <button id="endCallBtn" class="controlBtn danger" type="button">End</button>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <nav class="bottomNav" aria-label="Primary">
+      <button id="tabMessages" class="navBtn active" type="button" aria-current="page">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M21 15a2 2 0 0 1-2 2H8l-4 4V5a2 2 0 0 1 2-2h13a2 2 0 0 1 2 2z"></path>
+        </svg>
+        Messages
+      </button>
+
+      <button id="tabCalls" class="navBtn" type="button">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6A19.79 19.79 0 0 1 2.12 4.18 2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.12.9.36 1.78.72 2.62a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.46-1.29a2 2 0 0 1 2.11-.45c.84.36 1.72.6 2.62.72A2 2 0 0 1 22 16.92z"></path>
+        </svg>
+        Calls
+      </button>
+    </nav>
+  </div>
+
+  <div id="sessionBanner" class="banner" role="status" aria-live="assertive"></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/peerjs@1.5.4/dist/peerjs.min.js"></script>
+
+  <script>
+    (() => {
+      "use strict";
+
+      const els = {
+        pairingScreen: document.getElementById("pairingScreen"),
+        appScreen: document.getElementById("appScreen"),
+
+        myCode: document.getElementById("myCode"),
+        copyBtn: document.getElementById("copyBtn"),
+        pairStatus: document.getElementById("pairStatus"),
+
+        joinCodeInput: document.getElementById("joinCodeInput"),
+        joinBtn: document.getElementById("joinBtn"),
+        joinError: document.getElementById("joinError"),
+
+        connDot: document.getElementById("connDot"),
+        connText: document.getElementById("connText"),
+
+        messagesPanel: document.getElementById("messagesPanel"),
+        callsPanel: document.getElementById("callsPanel"),
+
+        chatEmpty: document.getElementById("chatEmpty"),
+        chatList: document.getElementById("chatList"),
+        chatForm: document.getElementById("chatForm"),
+        chatInput: document.getElementById("chatInput"),
+        chatSend: document.getElementById("chatSend"),
+
+        tabMessages: document.getElementById("tabMessages"),
+        tabCalls: document.getElementById("tabCalls"),
+
+        callIdle: document.getElementById("callIdle"),
+        startVoice: document.getElementById("startVoice"),
+        startVideo: document.getElementById("startVideo"),
+        callError: document.getElementById("callError"),
+
+        incomingCall: document.getElementById("incomingCall"),
+        incomingText: document.getElementById("incomingText"),
+        acceptCall: document.getElementById("acceptCall"),
+        declineCall: document.getElementById("declineCall"),
+
+        activeCall: document.getElementById("activeCall"),
+        videoSurface: document.getElementById("videoSurface"),
+        remoteVideo: document.getElementById("remoteVideo"),
+        localVideo: document.getElementById("localVideo"),
+        voiceSurface: document.getElementById("voiceSurface"),
+        callStateText: document.getElementById("callStateText"),
+        callTimer: document.getElementById("callTimer"),
+
+        muteBtn: document.getElementById("muteBtn"),
+        cameraBtn: document.getElementById("cameraBtn"),
+        endCallBtn: document.getElementById("endCallBtn"),
+
+        sessionBanner: document.getElementById("sessionBanner")
+      };
+
+      const state = {
+        peer: null,
+        conn: null,
+        call: null,
+        incomingCall: null,
+
+        localStream: null,
+        remoteStream: null,
+
+        myCode: null,
+        joiningCode: null,
+        role: null,
+
+        sessionActive: false,
+        connected: false,
+        destroying: false,
+
+        callStatus: "idle",
+        callKind: null,
+        callRole: null,
+        pendingIncoming: null,
+
+        muted: false,
+        cameraOff: false,
+
+        callStartedAt: null,
+        callTimerId: null,
+        callClosing: false
+      };
+
+      const peerConfig = {
+        debug: 1,
+        config: {
+          iceServers: [
+            { urls: "stun:stun.l.google.com:19302" },
+            { urls: "stun:stun1.l.google.com:19302" }
+          ]
+        }
+      };
+
+      let waitingTimer = null;
+      let resetTimer = null;
+      let bannerTimer = null;
+      let callErrorTimer = null;
+
+      init();
+
+      function init() {
+        bindUI();
+
+        if (typeof Peer === "undefined") {
+          setPairStatus("PeerJS failed to load. Check internet connection.");
+          return;
+        }
+
+        startHost();
+      }
+
+      function bindUI() {
+        els.copyBtn.addEventListener("click", copyCode);
+
+        els.joinBtn.addEventListener("click", joinWithCode);
+
+        els.joinCodeInput.addEventListener("keydown", (event) => {
+          if (event.key === "Enter") {
+            event.preventDefault();
+            joinWithCode();
+          }
+        });
+
+        els.joinCodeInput.addEventListener("input", () => {
+          const cleaned = els.joinCodeInput.value
+            .toUpperCase()
+            .replace(/[^A-Z0-9]/g, "")
+            .slice(0, 3);
+
+          els.joinCodeInput.value = cleaned;
+          setJoinError("");
+        });
+
+        els.tabMessages.addEventListener("click", () => switchTab("messages"));
+        els.tabCalls.addEventListener("click", () => switchTab("calls"));
+
+        els.chatForm.addEventListener("submit", (event) => {
+          event.preventDefault();
+          sendChatMessage();
+        });
+
+        els.startVoice.addEventListener("click", () => startCall("audio"));
+        els.startVideo.addEventListener("click", () => startCall("video"));
+
+        els.acceptCall.addEventListener("click", acceptIncomingCall);
+        els.declineCall.addEventListener("click", declineIncomingCall);
+
+        els.endCallBtn.addEventListener("click", () => endCall(true));
+        els.muteBtn.addEventListener("click", toggleMute);
+        els.cameraBtn.addEventListener("click", toggleCamera);
+
+        window.addEventListener("pagehide", () => {
+          try {
+            if (state.conn && state.conn.open) {
+              state.conn.send({ type: "bye" });
+            }
+
+            if (state.peer && !state.peer.destroyed) {
+              state.peer.destroy();
+            }
+          } catch {
+            // Ignore cleanup errors.
+          }
+        });
+      }
+
+      function randomInt(max) {
+        try {
+          const values = new Uint32Array(1);
+          crypto.getRandomValues(values);
+          return values[0] % max;
+        } catch {
+          return Math.floor(Math.random() * max);
+        }
+      }
+
+      function randomId() {
+        return Math.random().toString(36).slice(2, 10);
+      }
+
+      function generateCode() {
+        const letters = "ABCDEFGHJKLMNPQRSTUVWXYZ";
+        const digits = "23456789";
+
+        const chars = [];
+        const digitPosition = randomInt(3);
+
+        for (let i = 0; i < 3; i++) {
+          if (i === digitPosition) {
+            chars.push(digits[randomInt(digits.length)]);
+          } else {
+            chars.push(letters[randomInt(letters.length)]);
+          }
+        }
+
+        return chars.join("");
+      }
+
+      function isValidPairCode(code) {
+        if (!/^[A-Z0-9]{3}$/.test(code)) return false;
+
+        const letters = code.replace(/[0-9]/g, "").length;
+        const digits = code.replace(/[A-Z]/g, "").length;
+
+        return letters === 2 && digits === 1;
+      }
+
+      function startHost() {
+        clearTimeout(resetTimer);
+
+        state.destroying = false;
+        state.sessionActive = false;
+        state.connected = false;
+        state.joiningCode = null;
+        state.role = "host";
+
+        setChatEnabled(false);
+        clearChat();
+        teardownPeer();
+
+        showPairing();
+        setJoinBusy(false);
+        setJoinError("");
+
+        const code = generateCode();
+        state.myCode = code;
+
+        els.myCode.textContent = "···";
+        els.copyBtn.disabled = true;
+        setPairStatus("Generating code…");
+
+        createHostPeer(code);
+      }
+
+      function createHostPeer(code) {
+        let peer;
+
+        try {
+          peer = new Peer(`xumi-v1-${code}`, peerConfig);
+        } catch {
+          setPairStatus("Connection error.");
+          return;
+        }
+
+        state.peer = peer;
+
+        peer.on("open", () => {
+          if (state.destroying) return;
+
+          if (state.sessionActive) {
+            setConn("Connected", "connected");
+            return;
+          }
+
+          els.myCode.textContent = code;
+          els.copyBtn.disabled = false;
+          setPairStatus("Waiting for someone to join…");
+          startWaitingTimer();
+        });
+
+        peer.on("connection", (conn) => {
+          if (state.destroying) return;
+
+          if (state.conn) {
+            conn.on("open", () => {
+              try {
+                conn.send({ type: "full" });
+              } catch {
+                // Ignore.
+              }
+
+              setTimeout(() => {
+                try {
+                  conn.close();
+                } catch {
+                  // Ignore.
+                }
+              }, 300);
+            });
+
+            return;
+          }
+
+          clearWaitingTimer();
+          setupConnection(conn);
+        });
+
+        peer.on("call", handleIncomingCall);
+        peer.on("disconnected", handlePeerDisconnected);
+        peer.on("error", handlePeerError);
+      }
+
+      function createGuestPeer(code) {
+        let peer;
+
+        try {
+          peer = new Peer(`xumi-v1-g-${randomId()}`, peerConfig);
+        } catch {
+          setJoinError("Connection error.");
+          startHostSoon(1200);
+          return;
+        }
+
+        state.peer = peer;
+        state.role = "guest";
+        state.joiningCode = code;
+
+        peer.on("open", () => {
+          if (state.destroying) return;
+
+          const conn = peer.connect(`xumi-v1-${code}`, {
+            reliable: true,
+            serialization: "json"
+          });
+
+          if (!conn) {
+            setJoinBusy(false);
+            setJoinError("Could not connect.");
+            startHostSoon(1200);
+            return;
+          }
+
+          setupConnection(conn);
+        });
+
+        peer.on("call", handleIncomingCall);
+        peer.on("disconnected", handlePeerDisconnected);
+        peer.on("error", handlePeerError);
+      }
+
+      function setupConnection(conn) {
+        state.conn = conn;
+
+        conn.on("open", () => {
+          if (state.destroying) return;
+
+          state.sessionActive = true;
+          state.connected = true;
+
+          clearWaitingTimer();
+          setJoinBusy(false);
+
+          showApp();
+          switchTab("messages");
+          setConn("Connected", "connected");
+          setChatEnabled(true);
+        });
+
+        conn.on("data", handleData);
+        conn.on("close", handleConnectionClosed);
+        conn.on("error", handleConnectionClosed);
+      }
+
+      function handleData(data) {
+        if (state.destroying || !data || typeof data !== "object") return;
+
+        if (data.type === "full") {
+          if (!state.sessionActive) {
+            setJoinBusy(false);
+            setJoinError("That session already has two people.");
+            teardownSession();
+            showPairing();
+            setPairStatus("Waiting for someone to join…");
+            startHostSoon(1600);
+          }
+          return;
+        }
+
+        if (data.type === "bye") {
+          handleConnectionClosed();
+          return;
+        }
+
+        if (data.type === "chat" && typeof data.text === "string") {
+          appendMessage("them", data.text, data.ts);
+        }
+      }
+
+      function handleConnectionClosed() {
+        if (state.destroying) return;
+
+        if (state.sessionActive) {
+          endSession("Your connection has ended.");
+          return;
+        }
+
+        state.conn = null;
+
+        if (state.role === "guest") {
+          setJoinBusy(false);
+          setJoinError("Connection closed.");
+          showPairing();
+          setPairStatus("Waiting for someone to join…");
+          startHostSoon(1400);
+        } else {
+          setPairStatus("Waiting for someone to join…");
+          startWaitingTimer();
+        }
+      }
+
+      function joinWithCode() {
+        const code = els.joinCodeInput.value.trim().toUpperCase();
+
+        if (!isValidPairCode(code)) {
+          setJoinError("Enter a valid 3-character code.");
+          return;
+        }
+
+        if (typeof Peer === "undefined") {
+          setJoinError("PeerJS not loaded.");
+          return;
+        }
+
+        clearTimeout(resetTimer);
+
+        setJoinError("");
+        setJoinBusy(true);
+
+        teardownSession();
+        state.destroying = false;
+
+        state.role = "guest";
+        state.joiningCode = code;
+
+        createGuestPeer(code);
+      }
+
+      function handlePeerError(err) {
+        if (state.destroying) return;
+
+        const type = err && err.type;
+
+        console.error("PeerJS error:", err);
+
+        if (type === "unavailable-id") {
+          if (!state.sessionActive) {
+            setPairStatus("Code collision. Generating a new code.");
+            startHost();
+          }
+          return;
+        }
+
+        if (type === "peer-unavailable") {
+          if (state.role === "guest") {
+            setJoinBusy(false);
+            setJoinError("Code not found.");
+            showPairing();
+            setPairStatus("Waiting for someone to join…");
+            startHostSoon(1200);
+          }
+          return;
+        }
+
+        if (
+          type === "network" ||
+          type === "socket-error" ||
+          type === "socket-closed" ||
+          type === "server-error" ||
+          type === "disconnected"
+        ) {
+          if (!state.sessionActive) {
+            setPairStatus("Connection error. Retrying…");
+            startHostSoon(2000);
+          } else {
+            setConn("Reconnecting…", "connecting");
+          }
+          return;
+        }
+
+        if (type === "browser-incompatible") {
+          showBanner("This browser is not supported.");
+          return;
+        }
+
+        if (type === "webrtc") {
+          if (state.callStatus !== "idle") {
+            setCallError("Call error.");
+          } else {
+            showBanner("WebRTC error.");
+          }
+          return;
+        }
+
+        if (!state.sessionActive) {
+          setJoinError("Connection error.");
+          startHostSoon(1600);
+        } else {
+          showBanner("Connection error.");
+        }
+      }
+
+      function handlePeerDisconnected() {
+        if (state.destroying || !state.peer || state.peer.destroyed) return;
+
+        if (state.sessionActive) {
+          setConn("Reconnecting…", "connecting");
+        } else {
+          setPairStatus("Reconnecting…");
+        }
+
+        try {
+          state.peer.reconnect();
+        } catch {
+          if (!state.sessionActive) {
+            startHostSoon(1500);
+          }
+        }
+      }
+
+      function endSession(message) {
+        if (state.callStatus !== "idle") {
+          endCall(false);
+        }
+
+        teardownSession();
+
+        showBanner(message);
+        showPairing();
+
+        setPairStatus(message);
+        setJoinError("");
+        setJoinBusy(false);
+
+        startHostSoon(2200);
+      }
+
+      function teardownSession() {
+        state.destroying = true;
+
+        state.sessionActive = false;
+        state.connected = false;
+
+        setChatEnabled(false);
+        clearChat();
+
+        if (state.conn) {
+          try {
+            state.conn.close();
+          } catch {
+            // Ignore.
+          }
+          state.conn = null;
+        }
+
+        teardownPeer();
+      }
+
+      function teardownPeer() {
+        clearWaitingTimer();
+
+        if (state.peer) {
+          try {
+            state.peer.destroy();
+          } catch {
+            // Ignore.
+          }
+
+          state.peer = null;
+        }
+
+        state.remoteStream = null;
+        els.remoteVideo.srcObject = null;
+      }
+
+      function startHostSoon(delay = 1800) {
+        clearTimeout(resetTimer);
+
+        resetTimer = setTimeout(() => {
+          if (!state.sessionActive) {
+            startHost();
+          }
+        }, delay);
+      }
+
+      function startWaitingTimer() {
+        clearWaitingTimer();
+
+        waitingTimer = setTimeout(() => {
+          if (!state.sessionActive && state.role === "host") {
+            setPairStatus("Code expired. Generating a new code.");
+            startHost();
+          }
+        }, 5 * 60 * 1000);
+      }
+
+      function clearWaitingTimer() {
+        clearTimeout(waitingTimer);
+        waitingTimer = null;
+      }
+
+      function showPairing() {
+        els.appScreen.classList.add("hidden");
+        els.pairingScreen.classList.remove("hidden");
+      }
+
+      function showApp() {
+        els.pairingScreen.classList.add("hidden");
+        els.appScreen.classList.remove("hidden");
+      }
+
+      function setPairStatus(text) {
+        els.pairStatus.textContent = text;
+      }
+
+      function setJoinError(text) {
+        els.joinError.textContent = text;
+      }
+
+      function setJoinBusy(busy) {
+        els.joinBtn.disabled = busy;
+        els.joinBtn.textContent = busy ? "Connecting…" : "Connect";
+      }
+
+      function setConn(text, mode) {
+        els.connText.textContent = text;
+        els.connDot.className = `dot ${mode}`;
+      }
+
+      function showBanner(text) {
+        els.sessionBanner.textContent = text;
+        els.sessionBanner.classList.add("visible");
+
+        clearTimeout(bannerTimer);
+
+        bannerTimer = setTimeout(() => {
+          els.sessionBanner.classList.remove("visible");
+        }, 2600);
+      }
+
+      function switchTab(tab) {
+        const isMessages = tab === "messages";
+
+        els.tabMessages.classList.toggle("active", isMessages);
+        els.tabCalls.classList.toggle("active", !isMessages);
+
+        if (isMessages) {
+          els.tabMessages.setAttribute("aria-current", "page");
+          els.tabCalls.removeAttribute("aria-current");
+        } else {
+          els.tabCalls.setAttribute("aria-current", "page");
+          els.tabMessages.removeAttribute("aria-current");
+        }
+
+        els.messagesPanel.classList.toggle("active", isMessages);
+        els.callsPanel.classList.toggle("active", !isMessages);
+
+        if (isMessages && !els.chatInput.disabled) {
+          els.chatInput.focus({ preventScroll: true });
+        }
+      }
+
+      function clearChat() {
+        els.chatList.innerHTML = "";
+        els.chatEmpty.classList.remove("hidden");
+      }
+
+      function setChatEnabled(enabled) {
+        els.chatInput.disabled = !enabled;
+        els.chatSend.disabled = !enabled;
+      }
+
+      function appendMessage(side, text, timestamp) {
+        els.chatEmpty.classList.add("hidden");
+
+        const row = document.createElement("div");
+        row.className = `msg ${side}`;
+
+        const bubble = document.createElement("div");
+        bubble.className = "bubble";
+
+        const textNode = document.createElement("div");
+        textNode.textContent = text;
+
+        const time = document.createElement("span");
+        time.className = "time";
+
+        const date = timestamp ? new Date(timestamp) : new Date();
+
+        time.textContent = new Intl.DateTimeFormat(undefined, {
+          hour: "2-digit",
+          minute: "2-digit"
+        }).format(Number.isNaN(date.getTime()) ? new Date() : date);
+
+        bubble.appendChild(textNode);
+        bubble.appendChild(time);
+        row.appendChild(bubble);
+        els.chatList.appendChild(row);
+
+        els.chatList.scrollTop = els.chatList.scrollHeight;
+      }
+
+      async function copyCode() {
+        if (!state.myCode) return;
+
+        const code = state.myCode;
+        const original = els.copyBtn.textContent;
+
+        try {
+          await navigator.clipboard.writeText(code);
+          flashCopied();
+        } catch {
+          try {
+            const helper = document.createElement("textarea");
+            helper.value = code;
+            document.body.appendChild(helper);
+            helper.select();
+            document.execCommand("copy");
+            helper.remove();
+            flashCopied();
+          } catch {
+            showBanner("Could not copy code.");
+          }
+        }
+
+        function flashCopied() {
+          els.copyBtn.textContent = "Copied";
+
+          setTimeout(() => {
+            els.copyBtn.textContent = original;
+          }, 1200);
+        }
+      }
+
+      function sendChatMessage() {
+        const text = els.chatInput.value.trim();
+
+        if (!text) return;
+
+        if (!state.conn || !state.conn.open) {
+          showBanner("Not connected.");
+          return;
+        }
+
+        const payload = {
+          type: "chat",
+          text,
+          ts: Date.now()
+        };
+
+        try {
+          state.conn.send(payload);
+          appendMessage("me", text, payload.ts);
+          els.chatInput.value = "";
+          els.chatInput.focus();
+        } catch {
+          showBanner("Message could not be sent.");
+        }
+      }
+
+      async function getMedia(kind) {
+        if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+          const error = new Error("Unsupported");
+          error.name = "UnsupportedError";
+          throw error;
+        }
+
+        const constraints = {
+          audio: {
+            echoCancellation: true,
+            noiseSuppression: true
+          },
+          video: false
+        };
+
+        if (kind === "video") {
+          constraints.video = {
+            width: { ideal: 1280 },
+            height: { ideal: 720 },
+            facingMode: "user"
+          };
+        }
+
+        return navigator.mediaDevices.getUserMedia(constraints);
+      }
+
+      function attachLocalStream(stream, kind) {
+        if (kind === "video" && stream) {
+          els.localVideo.srcObject = stream;
+        } else {
+          els.localVideo.srcObject = null;
+        }
+      }
+
+      async function startCall(kind) {
+        if (!state.conn || !state.conn.open || !state.peer || state.peer.destroyed) {
+          setCallError("Connection is not ready.");
+          return;
+        }
+
+        if (state.callStatus !== "idle") return;
+
+        try {
+          setCallError("");
+
+          const stream = await getMedia(kind);
+
+          state.localStream = stream;
+          state.callKind = kind;
+          state.callRole = "caller";
+          state.callStatus = "requesting";
+          state.muted = false;
+          state.cameraOff = false;
+
+          attachLocalStream(stream, kind);
+          renderCall();
+
+          const remoteId = state.conn.peer;
+
+          const call = state.peer.call(remoteId, stream, {
+            metadata: { kind }
+          });
+
+          if (!call) {
+            cleanupMedia();
+            resetCallState();
+            setCallError("Could not start call.");
+            return;
+          }
+
+          setupCall(call);
+        } catch (err) {
+          handleMediaError(err);
+        }
+      }
+
+      function setupCall(call) {
+        state.call = call;
+
+        call.on("stream", (remoteStream) => {
+          state.remoteStream = remoteStream;
+          els.remoteVideo.srcObject = remoteStream;
+          setCallConnected();
+        });
+
+        call.on("close", () => {
+          handleRemoteCallEnd();
+        });
+
+        call.on("error", () => {
+          if (state.callStatus !== "idle") {
+            cleanupMedia();
+            resetCallState();
+            setCallError("Call error.");
+          }
+        });
+      }
+
+      function handleIncomingCall(call) {
+        if (state.destroying || !state.connected || state.callStatus !== "idle") {
+          try {
+            call.close();
+          } catch {
+            // Ignore.
+          }
+          return;
+        }
+
+        state.incomingCall = call;
+        state.pendingIncoming = (call.metadata && call.metadata.kind) || "audio";
+        state.callStatus = "incoming";
+
+        switchTab("calls");
+        renderCall();
+      }
+
+      async function acceptIncomingCall() {
+        const call = state.incomingCall;
+        const kind = state.pendingIncoming || "audio";
+
+        if (!call || state.callStatus !== "incoming") return;
+
+        try {
+          const stream = await getMedia(kind);
+
+          state.localStream = stream;
+          state.callKind = kind;
+          state.callRole = "callee";
+          state.callStatus = "accepted";
+          state.incomingCall = null;
+          state.muted = false;
+          state.cameraOff = false;
+
+          attachLocalStream(stream, kind);
+          setupCall(call);
+
+          call.answer(stream);
+
+          renderCall();
+        } catch (err) {
+          handleMediaError(err);
+
+          try {
+            call.close();
+          } catch {
+            // Ignore.
+          }
+
+          cleanupMedia();
+          resetCallState();
+        }
+      }
+
+      function declineIncomingCall() {
+        if (state.callStatus !== "incoming") return;
+
+        const call = state.incomingCall;
+
+        state.incomingCall = null;
+
+        try {
+          if (call) call.close();
+        } catch {
+          // Ignore.
+        }
+
+        resetCallState();
+      }
+
+      function endCall(notify = true) {
+        if (state.callStatus === "idle" && !state.call && !state.localStream) {
+          return;
+        }
+
+        state.callClosing = true;
+
+        if (state.call) {
+          try {
+            state.call.close();
+          } catch {
+            // Ignore.
+          }
+        }
+
+        cleanupMedia();
+        resetCallState();
+
+        setTimeout(() => {
+          state.callClosing = false;
+        }, 500);
+      }
+
+      function handleRemoteCallEnd() {
+        if (state.callClosing || state.destroying) return;
+
+        cleanupMedia();
+        resetCallState();
+
+        setCallError("Call ended.");
+      }
+
+      function cleanupMedia() {
+        if (state.localStream) {
+          state.localStream.getTracks().forEach((track) => track.stop());
+          state.localStream = null;
+        }
+
+        els.localVideo.srcObject = null;
+        els.remoteVideo.srcObject = null;
+        state.remoteStream = null;
+      }
+
+      function resetCallState() {
+        state.call = null;
+        state.incomingCall = null;
+        state.callKind = null;
+        state.callRole = null;
+        state.callStatus = "idle";
+        state.pendingIncoming = null;
+        state.muted = false;
+        state.cameraOff = false;
+
+        stopCallTimer();
+        renderCall();
+      }
+
+      function renderCall() {
+        const status = state.callStatus;
+
+        const activeStates = ["requesting", "accepted", "connecting", "connected"];
+        const isActive = activeStates.includes(status);
+
+        els.callIdle.classList.toggle("hidden", status !== "idle");
+        els.incomingCall.classList.toggle("hidden", status !== "incoming");
+        els.activeCall.classList.toggle("hidden", !isActive);
+
+        if (status === "incoming") {
+          els.incomingText.textContent =
+            `Incoming ${state.pendingIncoming === "video" ? "video" : "voice"} call`;
+        }
+
+        if (status === "requesting") {
+          els.callStateText.textContent = "Calling…";
+        } else if (status === "accepted" || status === "connecting") {
+          els.callStateText.textContent = "Connecting…";
+        } else if (status === "connected") {
+          els.callStateText.textContent = "Connected";
+        } else {
+          els.callStateText.textContent = "";
+        }
+
+        const isVideo = state.callKind === "video";
+
+        els.videoSurface.classList.toggle(
+          "hidden",
+          !isVideo || !isActive
+        );
+
+        els.voiceSurface.classList.toggle(
+          "hidden",
+          isVideo && isActive
+        );
+
+        els.cameraBtn.classList.toggle("hidden", !isVideo);
+
+        els.muteBtn.textContent = state.muted ? "Unmute" : "Mute";
+        els.cameraBtn.textContent = state.cameraOff ? "Camera On" : "Camera Off";
+
+        if (status !== "connected") {
+          els.callTimer.textContent = "00:00";
+        }
+      }
+
+      function setCallConnected() {
+        if (state.callStatus === "connected") return;
+
+        state.callStatus = "connected";
+        state.pendingIncoming = null;
+
+        renderCall();
+        startCallTimer();
+
+        if (els.remoteVideo.play) {
+          els.remoteVideo.play().catch(() => {});
+        }
+
+        if (els.localVideo.play) {
+          els.localVideo.play().catch(() => {});
+        }
+      }
+
+      function startCallTimer() {
+        stopCallTimer();
+
+        state.callStartedAt = Date.now();
+        updateCallTimer();
+
+        state.callTimerId = setInterval(updateCallTimer, 1000);
+      }
+
+      function stopCallTimer() {
+        clearInterval(state.callTimerId);
+        state.callTimerId = null;
+        state.callStartedAt = null;
+        els.callTimer.textContent = "00:00";
+      }
+
+      function updateCallTimer() {
+        if (!state.callStartedAt) return;
+
+        const elapsed = Math.floor((Date.now() - state.callStartedAt) / 1000);
+        const minutes = String(Math.floor(elapsed / 60)).padStart(2, "0");
+        const seconds = String(elapsed % 60).padStart(2, "0");
+
+        els.callTimer.textContent = `${minutes}:${seconds}`;
+      }
+
+      function toggleMute() {
+        if (!state.localStream) return;
+
+        const audioTracks = state.localStream.getAudioTracks();
+        if (!audioTracks.length) return;
+
+        state.muted = !state.muted;
+
+        audioTracks.forEach((track) => {
+          track.enabled = !state.muted;
+        });
+
+        renderCall();
+      }
+
+      function toggleCamera() {
+        if (!state.localStream || state.callKind !== "video") return;
+
+        const videoTracks = state.localStream.getVideoTracks();
+        if (!videoTracks.length) return;
+
+        state.cameraOff = !state.cameraOff;
+
+        videoTracks.forEach((track) => {
+          track.enabled = !state.cameraOff;
+        });
+
+        renderCall();
+      }
+
+      function setCallError(message) {
+        els.callError.textContent = message;
+
+        clearTimeout(callErrorTimer);
+
+        if (message) {
+          callErrorTimer = setTimeout(() => {
+            els.callError.textContent = "";
+          }, 5000);
+        }
+      }
+
+      function handleMediaError(err) {
+        if (!err) {
+          setCallError("Microphone or camera unavailable.");
+          return;
+        }
+
+        if (err.name === "NotAllowedError" || err.name === "SecurityError") {
+          setCallError("Permission was denied. Allow microphone or camera access.");
+        } else if (err.name === "NotFoundError" || err.name === "OverconstrainedError") {
+          setCallError("No suitable microphone or camera was found.");
+        } else if (err.name === "UnsupportedError") {
+          setCallError("Calls require HTTPS or localhost and a supported browser.");
+        } else {
+          setCallError("Microphone or camera unavailable.");
+        }
+      }
+    })();
+  </script>
+</body>
+</html>
