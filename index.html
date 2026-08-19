@@ -502,7 +502,9 @@
       background: #000;
     }
 
-    .videoSurface video {
+    /* FIXED: remote video fills the surface via ID (was .videoSurface video,
+       which also stretched the local preview to 100% and covered the remote). */
+    #remoteVideo {
       width: 100%;
       height: 100%;
       object-fit: cover;
@@ -518,6 +520,7 @@
       border-radius: 18px;
       border: 2px solid rgba(255, 255, 255, 0.32);
       background: #000;
+      z-index: 2;
     }
 
     .voiceSurface {
