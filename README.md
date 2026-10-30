@@ -36,3 +36,9 @@ These are diagnostic steps, not reports of known defects:
 ## Editing and handoff
 
 Keep changes focused on the intended page content or presentation in `index.html`. Preserve the filename and existing relative references unless intentionally changing them; update paths when referenced files move or are renamed. In a handoff, summarize what changed and identify the affected file or references. Before describing the service as private or temporary, verify backend access controls, data retention, and call infrastructure.
+
+## Final release review
+
+- Check that `index.html` still points to the intended application entry module before publishing.
+- Test with network access available and keep a sensible fallback for externally loaded resources.
+- Review the published result once on a narrow screen and once on a wider screen; treat this as a release check, not an automated test report.
