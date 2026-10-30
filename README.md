@@ -22,6 +22,17 @@ Use this checklist after editing `index.html`. It describes actions to perform, 
 - Review the page at a narrow viewport and a wide viewport. Check that content, controls, and text remain visible and usable.
 - If an interaction or resource depends on deployment or server-side behavior, record that as requiring separate verification rather than marking it as confirmed by a local page review.
 
+## Accessibility review checklist
+
+These are future review checks, not claims that accessibility has been verified:
+
+- Use the keyboard to move through the join-code flow, message area, and voice and video call controls. Check that each available field and action can be reached and operated, and that focus order is predictable.
+- Check that a visible focus indicator remains easy to identify on every focused field, link, and control.
+- Check that the join-code field, message entry, and call controls have meaningful labels and instructions. Check that call and message feedback is not conveyed only by a change in colour or icon.
+- Check text, control, and focus-indicator contrast against the page backgrounds, including message content and any status feedback.
+- Review any images or media that convey information and check their alternatives in `index.html`; do not assume decorative elements need descriptive text.
+- If call indicators, transitions, or other effects animate, check the page with reduced motion enabled and whether motion can be reduced without losing important status information.
+
 ## Editing the page
 
 Update visible copy and presentation in `index.html`. The page references Google Fonts and loads PeerJS from a CDN; preserve those URLs unless you are intentionally changing the corresponding dependency. No separate asset files are listed at the repository root, so inspect the HTML for existing asset references before adding or replacing images. Keep any relative `src` or `href` paths aligned with the files they reference.
