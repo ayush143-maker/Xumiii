@@ -16,11 +16,18 @@ Then visit <http://localhost:8000>.
 
 Use this checklist after editing `index.html`. It describes actions to perform, not verified results.
 
-- Open the known entry page, `index.html`, in a browser and review the initial state.
+- Open `index.html` and review the initial state.
 - Try the join-code flow, message area, and voice and video call controls as the page presents them. Note any feedback or unavailable behavior; do not treat the interface alone as evidence of working server-side authentication, signalling, storage, or deletion.
-- Inspect the HTML's image and media references. Check that each referenced local path points to the intended file, and that external references load when available.
-- Review the page at a narrow viewport and a wide viewport. Check that content, controls, and text remain visible and usable.
 - If an interaction or resource depends on deployment or server-side behavior, record that as requiring separate verification rather than marking it as confirmed by a local page review.
+
+## Browser and layout reliability checklist
+
+This is a review checklist, not a record of completed compatibility testing. Choose current browsers relevant to the intended audience and this standalone HTML page; include desktop and mobile browsers where appropriate. The presence of the PeerJS script does not establish that calls or signalling work in any browser.
+
+- Review the join-code flow, message area, and voice and video call controls in each selected browser. Note differences in behavior or presentation, and distinguish page-level observations from server-side functionality that needs separate verification.
+- Open developer tools and inspect the console for JavaScript errors and relevant warnings. Check the network panel for failed page resources, the PeerJS CDN request, font requests, and any requests made by interactions. Note external or server-dependent failures rather than treating them as confirmed functionality.
+- Inspect `index.html` for local image and media references, verify each path against the corresponding file, and check spelling, case, and relative location. Review remote font and script requests for expected responses; consider whether the page remains legible and understandable if optional external resources are unavailable.
+- Review at a narrow mobile-sized viewport and a wide desktop-sized viewport. Check that the join-code flow, message content, and call controls remain visible and usable. Where possible, also review on a physical mobile device; viewport emulation alone does not establish device testing.
 
 ## Asset and loading review checklist
 
