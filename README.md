@@ -1,6 +1,6 @@
 # Xumiii
 
-A single-page HTML interface for short-lived conversations. `index.html` contains the visitor-facing join-code flow, message area, and voice and video call controls. The interface alone does not verify session authentication, call signalling, or message storage and deletion; those depend on the server-side implementation and deployment.
+A single-page HTML interface for short-lived conversations. `index.html` presents a join-code flow, message area, and voice and video call controls. This describes the interface, not a verified working conversation service: the page alone does not verify session authentication, call signalling, or message storage and deletion. Those depend on the server-side implementation and deployment.
 
 ## Open locally
 
