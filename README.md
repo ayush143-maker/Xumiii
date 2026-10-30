@@ -14,12 +14,12 @@ Then visit <http://localhost:8000>.
 
 ## Troubleshooting
 
-These are diagnostic steps, not claims of known defects:
+These are diagnostic steps, not reports of known defects:
 
 1. Confirm you opened `index.html`, the conversation interface entry page.
-2. If a local image or media resource is missing, inspect its `src` or `href` in `index.html` and check that the file exists at that relative path. Preserve spelling and letter case when moving or renaming files. The repository root lists `README.md` and `index.html`; inspect the HTML for actual references rather than assuming there are no nested assets.
+2. If a local image or media resource is missing, inspect its `src` or `href` in `index.html` and check that the file exists at that relative path. Preserve spelling and letter case when moving or renaming files. Inspect the HTML for actual references rather than assuming there are no nested assets.
 3. Inspect the browser console and network panel while loading the page and trying its controls. Check failed local requests, script errors, the PeerJS CDN request, font requests, and requests made by interactions.
-4. Separate local resources from network-dependent ones: PeerJS 1.5.4 is loaded from jsDelivr and Manrope is requested from Google Fonts. Failures of those requests require separate review from missing local files. Their presence does not establish that calls, signalling, or a backend service work.
+4. PeerJS 1.5.4 is loaded from jsDelivr and Manrope is requested from Google Fonts; both require network access. Review failures of these resources separately from local file issues. Their presence does not establish that calls, signalling, or a backend service work.
 
 ## Configuration and data handling
 
@@ -27,16 +27,18 @@ The repository overview lists `README.md` and `index.html`; no environment templ
 
 Values embedded in HTML or client-side scripts can be inspected by visitors. Do not put passwords, private API keys, or other secrets there. A join-code interface does not establish authentication, privacy, message retention, or deletion. Verify those behaviors in the server-side implementation and deployment before using real conversation data. Avoid including sensitive information in screenshots or review notes.
 
-## Review checklist
+## Contributing and handoff
 
-These are actions to perform, not verified results:
+Keep changes focused on the intended page content or presentation in `index.html`. Preserve the filename and any existing relative `src` and `href` references. If a file or reference needs to change, update the related paths deliberately. In a handoff, summarize what changed and name the affected file or references.
 
-- Review the join-code flow, message area, and call controls. Note feedback or unavailable behavior without treating the interface as proof of server-side functionality.
-- Review in relevant desktop and mobile browsers at narrow and wide viewports. Check that fields, messages, and controls remain visible and usable.
+Before publishing, manually review the result. The following checklist describes actions to perform, not verified results:
+
+- Review the join-code flow, message area, and call controls. Note unavailable behavior without treating the interface as proof of server-side functionality.
+- Check local resource paths against the files they reference, then review the page in relevant desktop and mobile browsers at narrow and wide viewports.
 - Use the keyboard to review fields and controls, focus visibility, labels, and feedback. Check contrast and whether important status is conveyed beyond colour or icons.
 - If indicators or transitions animate, check the page with reduced motion enabled.
-- Verify any service-dependent behavior separately from a local page review.
+- Verify service-dependent behavior separately from a local page review, and confirm the handoff description matches the changes made.
 
 ## Editing the page
 
-Update visible copy and presentation in `index.html`. The page references Google Fonts and loads PeerJS from a CDN; preserve those URLs unless intentionally changing the corresponding dependencies. Keep relative paths aligned with any local files they reference. Before describing the service as private or temporary, verify backend access controls, data retention, and call infrastructure.
+Update visible copy and presentation in `index.html`. The page references Google Fonts and loads PeerJS from a CDN; preserve those URLs unless intentionally changing the corresponding resources. Keep relative paths aligned with any local files they reference. Before describing the service as private or temporary, verify backend access controls, data retention, and call infrastructure.
