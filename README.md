@@ -4,11 +4,11 @@ A single-page interface for short-lived conversations, with a join-code flow, me
 
 ## Open locally
 
-Open `index.html` in a modern browser, or run:
+Open `index.html` in a modern browser, or serve the project folder over HTTP:
 
     python -m http.server 8000
 
-Visit http://localhost:8000.
+Then visit http://localhost:8000.
 
 ## Working on the experience
 
