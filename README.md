@@ -22,6 +22,16 @@ Use this checklist after editing `index.html`. It describes actions to perform, 
 - Review the page at a narrow viewport and a wide viewport. Check that content, controls, and text remain visible and usable.
 - If an interaction or resource depends on deployment or server-side behavior, record that as requiring separate verification rather than marking it as confirmed by a local page review.
 
+## Asset and loading review checklist
+
+These are review steps, not verified results or measured performance claims:
+
+- Inspect `index.html` for local image, audio, and font references and verify that each local path points to an existing file. The repository root lists `README.md` and `index.html`; check the actual referenced paths rather than assuming that no nested or externally hosted assets exist.
+- Review any local media for file size and suitability at its intended display size. Consider replacing unnecessarily large assets with appropriately sized versions, and keep only files that are actually used.
+- Confirm that the Google Fonts request for Manrope is intentional. Check readability if the external font request is unavailable, and avoid requesting styles the page does not use.
+- PeerJS 1.5.4 is loaded from jsDelivr. Confirm that this CDN script is an intentional dependency for the page's peer-related behavior, and review whether that behavior requires the external request. Do not treat the script reference alone as evidence that calls or signalling work.
+- Check that external font and script requests are appropriate for the intended deployment and that local path changes remain aligned with references in `index.html`.
+
 ## Accessibility review checklist
 
 These are future review checks, not claims that accessibility has been verified:
