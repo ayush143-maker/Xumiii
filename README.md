@@ -42,3 +42,7 @@ Keep changes focused on the intended page content or presentation in `index.html
 - Check that `index.html` still points to the intended application entry module before publishing.
 - Test with network access available and keep a sensible fallback for externally loaded resources.
 - Review the published result once on a narrow screen and once on a wider screen; treat this as a release check, not an automated test report.
+
+## Repository map
+
+- `index.html` — HTML page entry point.
