@@ -1,19 +1,17 @@
 # Xumiii
 
-A single-page interface for short-lived conversations using a join code, message area, and voice/video-call controls. This README describes the visible client UI; privacy and session-retention guarantees depend on the actual backend and deployment.
+**XUMi** is a single-page interface for short-lived conversations. Its current layout brings together a join-code flow, a message area, and voice/video-call controls in one place, aiming to make starting a quick conversation feel straightforward.
 
-## Run locally
+This repository describes the client interface. It does not, by itself, establish how sessions are authenticated, how calls are signalled, or how messages are stored and deleted. Those behaviours depend on the server-side implementation and deployment.
 
-Open index.html in a modern browser. If browser restrictions block local assets or APIs, serve the folder over HTTP.
+## Open locally
 
-## Structure and assets
+The project is a standalone HTML page. Open index.html in a modern browser, or run:
 
-`index.html` is the primary entry point. Keep linked images, audio, scripts, and styles in their existing relative locations; renaming files may break references.
+    python -m http.server 8000
 
-## Preview and deployment
+Then visit http://localhost:8000.
 
-Open the page in a modern browser. If local-file behavior is restricted, start a simple HTTP server from this folder and open the local address in your browser. For static hosting, publish the correct root folder and check asset paths after deployment.
+## Working on the experience
 
-## Making changes
-
-Test the page after edits and check both phone-sized and desktop-sized viewports. Confirm that buttons and other visible interactions work in the deployed version as well as locally.
+Keep the join and conversation states clear, and provide helpful feedback when a room cannot be reached. Before describing the service as private or temporary, verify the backend's access controls, retention policy, and call infrastructure.
