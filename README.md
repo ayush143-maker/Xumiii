@@ -1,15 +1,15 @@
 # Xumiii
 
-A single-page HTML interface for short-lived conversations. `index.html` presents a join-code flow, message area, and voice and video call controls. This describes the interface, not a verified working conversation service: the page alone does not verify session authentication, call signalling, or message storage and deletion. Those depend on the server-side implementation and deployment.
+A single-page HTML interface for short-lived conversations. `index.html` presents a join-code flow, a message area, and voice and video call controls. The page alone does not verify session authentication, call signalling, or message storage and deletion; those depend on the server-side implementation and deployment.
 
 ## Open locally
 
 Open `index.html` in a browser, or serve the project folder over HTTP:
 
-    python -m http.server 8000
+```sh
+python -m http.server 8000
+```
 
-Then visit http://localhost:8000. After editing `index.html`, reload the page and check the join and conversation states, including the feedback shown when a room cannot be reached.
+Then visit <http://localhost:8000>. After editing `index.html`, reload the page and review the join and conversation states, including feedback when a room cannot be reached.
 
-## Working on the experience
-
-Keep the join and conversation states clear, with helpful feedback when a room cannot be reached. Verify backend access controls, retention, and call infrastructure before describing the service as private or temporary.
+Before describing the service as private or temporary, verify backend access controls, data retention, and call infrastructure.
