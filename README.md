@@ -12,6 +12,12 @@ python -m http.server 8000
 
 Then visit <http://localhost:8000>.
 
+## Configuration and data handling
+
+The repository root lists `README.md` and `index.html`; no environment template or separate configuration file is listed. Review the HTML and any connected service's documentation before assuming how configuration or conversation data is handled.
+
+This page is delivered to the browser. Any values embedded in its HTML or client-side scripts can be inspected by visitors, so do not put passwords, private API keys, or other secrets there. A join-code interface does not by itself establish authentication, privacy, message retention, or deletion. Before using real conversation data, verify those behaviors in the server-side implementation and deployment. Avoid including real personal or sensitive information in screenshots, examples, or review notes.
+
 ## Manual review checklist
 
 Use this checklist after editing `index.html`. It describes actions to perform, not verified results.
