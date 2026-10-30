@@ -8,7 +8,7 @@ Open `index.html` in a modern browser, or serve the project folder over HTTP:
 
     python -m http.server 8000
 
-Then visit http://localhost:8000.
+Then visit http://localhost:8000. After editing `index.html`, reload the page and check the join and conversation states, including the feedback shown when a room cannot be reached.
 
 ## Working on the experience
 
